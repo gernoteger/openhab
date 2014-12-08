@@ -2,13 +2,13 @@ Manifest-Version: 1.0
 Private-Package: org.openhab.action.testaction.internal
 Ignore-Package: org.openhab.action.testaction.internal
 Bundle-License: http://www.eclipse.org/legal/epl-v10.html
-Bundle-Name: openHAB testAction Action
+Bundle-Name: openHAB TestAction Action
 Bundle-SymbolicName: org.openhab.action.testaction
 Bundle-Vendor: openHAB.org
 Bundle-Version: 1.3.0.qualifier
-Bundle-Activator: org.openhab.action.testaction.internal.testActionActivator
+Bundle-Activator: org.openhab.action.testaction.internal.TestActionActivator
 Bundle-ManifestVersion: 2
-Bundle-Description: This is the testAction action of the open Home Aut
+Bundle-Description: This is the TestAction action of the open Home Aut
  omation Bus (openHAB)
 Import-Package: org.apache.commons.lang,
  org.openhab.core.scriptengine.action,

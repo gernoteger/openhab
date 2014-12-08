@@ -20,9 +20,9 @@ import org.slf4j.LoggerFactory;
  * @author Gernot
  * @since 1.0
  */
-public final class testActionActivator implements BundleActivator {
+public final class TestActionActivator implements BundleActivator {
 
-	private static Logger logger = LoggerFactory.getLogger(testActionActivator.class); 
+	private static Logger logger = LoggerFactory.getLogger(TestActionActivator.class); 
 	
 	private static BundleContext context;
 	

@@ -20,17 +20,17 @@ import org.slf4j.LoggerFactory;
  * @author Gernot
  * @since 1.0
  */
-public class testAction {
+public class TestAction {
 
-	private static final Logger logger = LoggerFactory.getLogger(testAction.class);
+	private static final Logger logger = LoggerFactory.getLogger(TestAction.class);
 
 	// provide public static methods here
 	
 	// Example
 	@ActionDoc(text="A cool method that does some testAction", 
 			returns="<code>true</code>, if successful and <code>false</code> otherwise.")
-	public static boolean dotestAction(@ParamDoc(name="something", text="the something to do") String something) {
-		if (!testActionActionService.isProperlyConfigured) {
+	public static boolean doTestAction(@ParamDoc(name="something", text="the something to do") String something) {
+		if (!TestActionActionService.isProperlyConfigured) {
 			logger.debug("testAction action is not yet configured - execution aborted!");
 			return false;
 		}

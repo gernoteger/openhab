@@ -23,9 +23,9 @@ import org.slf4j.LoggerFactory;
  * @author Gernot
  * @since 1.0
  */
-public class testActionActionService implements ActionService, ManagedService {
+public class TestActionActionService implements ActionService, ManagedService {
 
-	private static final Logger logger = LoggerFactory.getLogger(testActionActionService.class);
+	private static final Logger logger = LoggerFactory.getLogger(TestActionActionService.class);
 
 	/**
 	 * Indicates whether this action is properly configured which means all
@@ -34,7 +34,7 @@ public class testActionActionService implements ActionService, ManagedService {
 	 */
 	/* default */ static boolean isProperlyConfigured = false;
 	
-	public testActionActionService() {
+	public TestActionActionService() {
 	}
 	
 	public void activate() {
@@ -47,12 +47,12 @@ public class testActionActionService implements ActionService, ManagedService {
 
 	@Override
 	public String getActionClassName() {
-		return testAction.class.getCanonicalName();
+		return TestAction.class.getCanonicalName();
 	}
 
 	@Override
 	public Class<?> getActionClass() {
-		return testAction.class;
+		return TestAction.class;
 	}
 
 	/**
