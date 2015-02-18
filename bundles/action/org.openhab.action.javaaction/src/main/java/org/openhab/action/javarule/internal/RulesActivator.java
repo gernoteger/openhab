@@ -6,7 +6,7 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  */
-package org.openhab.core.drools.internal;
+package org.openhab.action.javarule.internal;
 
 import org.openhab.core.events.EventPublisher;
 import org.openhab.core.items.ItemRegistry;

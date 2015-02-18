@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <projectDescription>
-	<name>org.openhab.action.javaaction</name>
+	<name>org.openhab.action.javarule</name>
 	<comment>This is the optional Drools rule engine of the open Home Automation Bus (openHAB)</comment>
 	<projects>
 	</projects>
