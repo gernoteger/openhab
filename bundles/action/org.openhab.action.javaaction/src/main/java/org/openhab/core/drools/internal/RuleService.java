@@ -73,32 +73,32 @@ public class RuleService extends AbstractActiveService implements ManagedService
 	
 	public void activate() {
 		
-		SystemEventListenerFactory.setSystemEventListener(new RuleEventListener());
+//		SystemEventListenerFactory.setSystemEventListener(new RuleEventListener());
 
-		KnowledgeBuilder kbuilder = KnowledgeBuilderFactory.newKnowledgeBuilder();
-		kbuilder.add(ResourceFactory.newClassPathResource(RULES_CHANGESET, getClass()), ResourceType.CHANGE_SET);
-
-		if(kbuilder.hasErrors()) {
-		    logger.error("There are errors in the rules: " + kbuilder.getErrors());
-		    return;
-		}
-
-		KnowledgeBase kbase = KnowledgeBaseFactory.newKnowledgeBase();
-
-		KnowledgeAgentConfiguration aconf = KnowledgeAgentFactory.newKnowledgeAgentConfiguration();
-		aconf.setProperty("drools.agent.newInstance", "false");
-		KnowledgeAgent kagent = KnowledgeAgentFactory.newKnowledgeAgent("RuleAgent", kbase, aconf);		 
-		kagent.applyChangeSet(ResourceFactory.newClassPathResource(RULES_CHANGESET, getClass()));
-		kbase.addKnowledgePackages(kbuilder.getKnowledgePackages());
-		ksession = kbase.newStatefulKnowledgeSession();
-				
-		// activate notifications
+//		KnowledgeBuilder kbuilder = KnowledgeBuilderFactory.newKnowledgeBuilder();
+//		kbuilder.add(ResourceFactory.newClassPathResource(RULES_CHANGESET, getClass()), ResourceType.CHANGE_SET);
+//
+//		if(kbuilder.hasErrors()) {
+//		    logger.error("There are errors in the rules: " + kbuilder.getErrors());
+//		    return;
+//		}
+//
+//		KnowledgeBase kbase = KnowledgeBaseFactory.newKnowledgeBase();
+//
+//		KnowledgeAgentConfiguration aconf = KnowledgeAgentFactory.newKnowledgeAgentConfiguration();
+//		aconf.setProperty("drools.agent.newInstance", "false");
+//		KnowledgeAgent kagent = KnowledgeAgentFactory.newKnowledgeAgent("RuleAgent", kbase, aconf);		 
+//		kagent.applyChangeSet(ResourceFactory.newClassPathResource(RULES_CHANGESET, getClass()));
+//		kbase.addKnowledgePackages(kbuilder.getKnowledgePackages());
+//		ksession = kbase.newStatefulKnowledgeSession();
+//				
+//		// activate notifications
 		ResourceFactory.getResourceChangeNotifierService().start();
 		ResourceFactory.getResourceChangeScannerService().start();
-		
-		// activate this for extensive logging
-		// KnowledgeRuntimeLoggerFactory.newConsoleLogger(ksession);
-		
+//		
+//		// activate this for extensive logging
+//		// KnowledgeRuntimeLoggerFactory.newConsoleLogger(ksession);
+//		
 		// set the scan interval to 20 secs
 		ResourceChangeScannerConfiguration sconf = ResourceFactory.getResourceChangeScannerService().newResourceChangeScannerConfiguration();
 		sconf.setProperty( "drools.resource.scanner.interval", "20" ); 
@@ -107,6 +107,7 @@ public class RuleService extends AbstractActiveService implements ManagedService
 		// now add all registered items to the session
 		if(itemRegistry!=null) {
 			for(Item item : itemRegistry.getItems()) {
+				logger.info("itemRegistry: '"+item.getName()+"'");
 				itemAdded(item);
 			}
 		}
@@ -150,17 +151,16 @@ public class RuleService extends AbstractActiveService implements ManagedService
 	 * {@inheritDoc}
 	 */
 	public void allItemsChanged(Collection<String> oldItemNames) {
-		if(ksession!=null) {
-			// first remove all previous items from the session
-			for(String oldItemName : oldItemNames) {
-				internalItemRemoved(oldItemName);
-			}
-			
-			// then add the current ones again
-			Collection<Item> items = itemRegistry.getItems();
-			for(Item item : items) {
-				internalItemAdded(item);
-			}
+		logger.info("allItemsChanged: count="+oldItemNames.size());
+		// first remove all previous items from the session
+		for(String oldItemName : oldItemNames) {
+			internalItemRemoved(oldItemName);
+		}
+		
+		// then add the current ones again
+		Collection<Item> items = itemRegistry.getItems();
+		for(Item item : items) {
+			internalItemAdded(item);
 		}
 	}
 
@@ -168,9 +168,10 @@ public class RuleService extends AbstractActiveService implements ManagedService
 	 * {@inheritDoc}
 	 */
 	public void itemAdded(Item item) {
-		if(ksession!=null) {
-			internalItemAdded(item);
-		}
+		logger.info("itemAdded: "+item.getName());
+		
+		internalItemAdded(item);
+		
 	}
 
 	/**
@@ -190,6 +191,7 @@ public class RuleService extends AbstractActiveService implements ManagedService
 	 * {@inheritDoc}
 	 */
 	public void stateChanged(Item item, State oldState, State newState) {
+		logger.info("stateChanged "+item.getName()+" from "+oldState.toString()+" -> "+newState.toString());
 		eventQueue.add(new StateEvent(item, oldState, newState));
 	}
 
@@ -197,6 +199,7 @@ public class RuleService extends AbstractActiveService implements ManagedService
 	 * {@inheritDoc}
 	 */
 	public void stateUpdated(Item item, State state) {
+		logger.info("stateUpdated "+item.getName()+" to "+state.toString());
 		eventQueue.add(new StateEvent(item, state));
 	}
 
@@ -213,23 +216,12 @@ public class RuleService extends AbstractActiveService implements ManagedService
 			return;
 		}
 		
-		FactHandle handle = factHandleMap.get(item.getName());
-		if(handle!=null) {
-			// we already know this item
-			try {
-				ksession.update(handle, item);
-			} catch(NullPointerException e) {
-				// this can be thrown because of a bug in drools when closing down the system
-			}
-		} else {
-			// it is a new item
-			handle = ksession.insert(item);
-			factHandleMap.put(item.getName(), handle);
-			if (item instanceof GenericItem) {
-				GenericItem genericItem = (GenericItem) item;
-				genericItem.addStateChangeListener(this);
-			}
+		
+		if (item instanceof GenericItem) {
+			GenericItem genericItem = (GenericItem) item;
+			genericItem.addStateChangeListener(this);
 		}
+		
 	}
 
 	private void internalItemRemoved(String itemName) {
@@ -245,36 +237,36 @@ public class RuleService extends AbstractActiveService implements ManagedService
 	 */
 	@Override
 	protected synchronized void execute() {
-		// remove all previous events from the session
-		Collection<FactHandle> handles = ksession.getFactHandles(new ObjectFilter() {			
-			public boolean accept(Object obj) {
-				if (obj instanceof RuleEvent) {
-					return true;
-				}
-				return false;
-			}
-		});
-		for(FactHandle handle : handles) {
-			ksession.retract(handle);
-		}
-
-		ArrayList<RuleEvent> clonedQueue = new ArrayList<RuleEvent>(eventQueue);
-		eventQueue.clear();
-		
-		// now add all recent events to the session
-		for(RuleEvent event : clonedQueue) {
-			Item item = event.getItem();
-			if(ksession!=null && item!=null) {
-				FactHandle factHandle = factHandleMap.get(item.getName());
-				if(factHandle!=null) {
-					ksession.update(factHandle, item);
-				}
-				ksession.insert(event);
-			}
-		}
-		
-		// run the rule evaluation
-		ksession.fireAllRules();
+//		// remove all previous events from the session
+//		Collection<FactHandle> handles = ksession.getFactHandles(new ObjectFilter() {			
+//			public boolean accept(Object obj) {
+//				if (obj instanceof RuleEvent) {
+//					return true;
+//				}
+//				return false;
+//			}
+//		});
+//		for(FactHandle handle : handles) {
+//			ksession.retract(handle);
+//		}
+//
+//		ArrayList<RuleEvent> clonedQueue = new ArrayList<RuleEvent>(eventQueue);
+//		eventQueue.clear();
+//		
+//		// now add all recent events to the session
+//		for(RuleEvent event : clonedQueue) {
+//			Item item = event.getItem();
+//			if(ksession!=null && item!=null) {
+//				FactHandle factHandle = factHandleMap.get(item.getName());
+//				if(factHandle!=null) {
+//					ksession.update(factHandle, item);
+//				}
+//				ksession.insert(event);
+//			}
+//		}
+//		
+//		// run the rule evaluation
+//		ksession.fireAllRules();
 			
 	}
 

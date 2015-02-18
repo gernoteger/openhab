@@ -46,6 +46,5 @@ Bundle-ClassPath: .,
  lib/mvel2.jar,
  lib/xpp3_min.jar,
  lib/xstream.jar
-Require-Bundle: org.eclipse.jdt.core
 Export-Package: org.openhab.core.drools.actions,org.openhab.core.drool
  s.event
