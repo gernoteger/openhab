@@ -1,11 +1,3 @@
-/**
- * Copyright (c) 2010-2015, openHAB.org and others.
- *
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
- */
 package org.openhab.action.javarule.internal;
 
 import static org.openhab.core.events.EventConstants.TOPIC_PREFIX;
@@ -15,6 +7,7 @@ import java.util.Collection;
 import java.util.Dictionary;
 
 import org.apache.commons.lang.StringUtils;
+import org.openhab.action.javarule.internal.rule.Rules;
 import org.openhab.core.items.GenericItem;
 import org.openhab.core.items.Item;
 import org.openhab.core.items.ItemNotFoundException;
@@ -32,23 +25,19 @@ import org.osgi.service.event.EventHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * Implements a generic class for rules; does all the necessary registration and
- * stuff an calls helper methods. TODO: describe api
- * 
- * @author gernot
- * 
- */
 public class RuleService extends AbstractActiveService implements
 		ManagedService, EventHandler, ItemRegistryChangeListener,
 		StateChangeListener {
 
-	static private final Logger logger = LoggerFactory
+	protected static final Logger logger = LoggerFactory
 			.getLogger(RuleService.class);
-
 	private ItemRegistry itemRegistry = null;
 
 	private long refreshInterval = 200;
+
+	public RuleService() {
+		super();
+	}
 
 	@Override
 	public void activate() {
@@ -60,6 +49,9 @@ public class RuleService extends AbstractActiveService implements
 			}
 		}
 
+		// register my dependencies
+		Rules.registerRules();
+
 		setProperlyConfigured(true);
 	}
 
@@ -67,6 +59,10 @@ public class RuleService extends AbstractActiveService implements
 	public void deactivate() {
 
 		shutdown();
+	}
+
+	public ItemRegistry getItemRegistry() {
+		return itemRegistry;
 	}
 
 	public void setItemRegistry(ItemRegistry itemRegistry) {
@@ -114,6 +110,8 @@ public class RuleService extends AbstractActiveService implements
 		for (Item item : items) {
 			internalItemAdded(item);
 		}
+
+		Rules.registerRules();
 	}
 
 	/**
@@ -135,32 +133,48 @@ public class RuleService extends AbstractActiveService implements
 		internalItemRemoved(item);
 	}
 
-	/**
-	 * {@inheritDoc}
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.openhab.action.javarule.internal.Rule#stateChanged(org.openhab.core
+	 * .items.Item, org.openhab.core.types.State, org.openhab.core.types.State)
 	 */
 	@Override
 	public void stateChanged(Item item, State oldState, State newState) {
-		logger.info("stateChanged " + item.getName() + " from "
-				+ oldState.toString() + " -> " + newState.toString());
+		logger.info("stateChanged({},{},{}) ", item.getName(), oldState,
+				newState);
+		for (Rule rule : Rules.rules()) {
+			try {
+				rule.stateChanged(item, oldState, newState);
+			} catch (Exception e) {
+				logger.warn("stateChanged {} ({},{},{}) failed", rule
+						.getClass().getName(), item, oldState, newState, e);
+			}
+		}
+
 	}
 
-	/**
-	 * {@inheritDoc}
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.openhab.action.javarule.internal.Rule#stateUpdated(org.openhab.core
+	 * .items.Item, org.openhab.core.types.State)
 	 */
 	@Override
 	public void stateUpdated(Item item, State state) {
-		logger.info("stateUpdated {} to {} ", item.getName(), state.toString());
-	}
+		logger.info("stateUpdated({},{}) ", item.getName(), state.toString());
 
-	/**
-	 * handle a command
-	 * 
-	 * @param item
-	 * @param command
-	 */
-	public void receiveCommand(Item item, Command command) {
-		logger.info("receiveCommand({},{}) ", item.getName(),
-				command.toString());
+		for (Rule rule : Rules.rules()) {
+			try {
+				rule.stateUpdated(item, state);
+			} catch (Exception e) {
+				logger.warn("stateUpdated {} ({}, {}) failed", rule.getClass()
+						.getName(), item, state, e);
+			}
+		}
+
 	}
 
 	/**
@@ -170,7 +184,15 @@ public class RuleService extends AbstractActiveService implements
 		logger.debug("receiveCommand({},{}) ", itemName, command.toString());
 		try {
 			Item item = itemRegistry.getItem(itemName);
-			receiveCommand(item, command);
+			// receiveCommand(item, command);
+			for (Rule rule : Rules.rules()) {
+				try {
+					rule.receiveCommand(item, command);
+				} catch (Exception e) {
+					logger.warn("receiveCommand {} ({}, {}) failed", rule
+							.getClass().getName(), item, command, e);
+				}
+			}
 		} catch (ItemNotFoundException e) {
 		}
 	}
@@ -242,4 +264,9 @@ public class RuleService extends AbstractActiveService implements
 				receiveCommand(itemName, command);
 		}
 	}
+
+	protected Item item(String itemName) throws ItemNotFoundException {
+		return itemRegistry.getItem(itemName);
+	}
+
 }
