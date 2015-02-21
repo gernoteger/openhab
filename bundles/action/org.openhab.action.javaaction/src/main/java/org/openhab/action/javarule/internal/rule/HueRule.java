@@ -3,8 +3,12 @@ package org.openhab.action.javarule.internal.rule;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.openhab.action.hue.internal.Rule;
 import org.openhab.core.items.Item;
 import org.openhab.core.types.Command;
+import org.openhab.core.types.State;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * implement my hue actions
@@ -13,6 +17,8 @@ import org.openhab.core.types.Command;
  * 
  */
 public class HueRule extends ItemsRule {
+	protected static final Logger logger = LoggerFactory
+			.getLogger(HueRule.class);
 
 	/***********************
 	 * 
@@ -134,4 +140,19 @@ public class HueRule extends ItemsRule {
 		sendCommand(group.getName(), cmd);
 		logger.debug("state of item {} is now {}", item, item.getState());
 	}
+
+	@Override
+	public void stateUpdated(Item item, State state) throws Exception {
+		super.stateUpdated(item, state);
+
+		/**
+		 * handle tap rules
+		 */
+		if (item.equals(Tap_1_1)) {
+			logger.debug("pressed {}", item);
+
+			Rule r = new Rule();
+		}
+	}
+
 }

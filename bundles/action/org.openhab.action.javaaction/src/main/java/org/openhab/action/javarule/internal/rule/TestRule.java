@@ -12,6 +12,8 @@ import org.openhab.action.javarule.internal.Items;
 import org.openhab.core.items.Item;
 import org.openhab.core.types.Command;
 import org.openhab.core.types.State;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 //import static org.openhab.action.javarule.internal.Items.*;
 
@@ -23,6 +25,8 @@ import org.openhab.core.types.State;
  * 
  */
 public class TestRule extends ItemsRule {
+	protected static final Logger logger = LoggerFactory
+			.getLogger(TestRule.class);
 
 	/**
 	 * {@inheritDoc}

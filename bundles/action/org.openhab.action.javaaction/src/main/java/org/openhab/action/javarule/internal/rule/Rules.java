@@ -21,6 +21,7 @@ public class Rules {
 		rules = new LinkedList<Rule>();
 		addRule(new TestRule());
 		addRule(new HueRule());
+		addRule(new TapRule());
 	}
 
 	/**
