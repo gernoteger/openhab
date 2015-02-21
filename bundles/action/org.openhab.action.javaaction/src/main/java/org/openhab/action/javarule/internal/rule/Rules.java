@@ -20,6 +20,7 @@ public class Rules {
 	public static void registerRules() {
 		rules = new LinkedList<Rule>();
 		addRule(new TestRule());
+		addRule(new HueRule());
 	}
 
 	/**

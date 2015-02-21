@@ -1,18 +1,18 @@
 package org.openhab.action.javarule.internal;
 
 import org.openhab.action.javarule.actions.BusEvent;
-import org.openhab.action.javarule.internal.rule.TestRule;
 import org.openhab.core.items.Item;
-import org.openhab.core.items.ItemNotFoundException;
+import org.openhab.core.library.types.DecimalType;
 import org.openhab.core.types.Command;
 import org.openhab.core.types.State;
+import org.openhab.core.types.Type;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class GenericRule implements Rule {
 
 	protected static final Logger logger = LoggerFactory
-			.getLogger(TestRule.class);
+			.getLogger(GenericRule.class);
 
 	public GenericRule() {
 		super();
@@ -62,22 +62,38 @@ public class GenericRule implements Rule {
 	 */
 	@SuppressWarnings("unchecked")
 	public static <T> T item(String itemName) {
-		try {
-			Item i = RulesActivator.itemRegistryTracker.getService().getItem(
-					itemName);
-
-			return (T) i;
-		} catch (ItemNotFoundException e) {
-			logger.warn("item not found: {}", itemName, e);
-			return null;
-		}
+		return Items.item(itemName);
 	}
 
+	/**
+	 * helpers to send TODO: refactor this!!
+	 * 
+	 * @param itemName
+	 * @param stateString
+	 */
 	static public void postUpdate(String itemName, String stateString) {
 		BusEvent.postUpdate(itemName, stateString);
 	}
 
+	static public void postUpdate(Item item, State state) {
+		BusEvent.postUpdate(item.getName(), state.toString());
+	}
+
 	static public void sendCommand(String itemName, String commandString) {
 		BusEvent.sendCommand(itemName, commandString);
+	}
+
+	static public void sendCommand(Item item, Command command) {
+		BusEvent.sendCommand(item.getName(), command.toString());
+	}
+
+	/**
+	 * convenience function: convert a Type to integer
+	 * 
+	 * @param v
+	 * @return
+	 */
+	public static Integer toInteger(Type v) {
+		return ((DecimalType) v).intValue();
 	}
 }
