@@ -8,6 +8,7 @@
  */
 package org.openhab.action.javarule.internal.rule;
 
+import org.openhab.action.javarule.internal.Items;
 import org.openhab.core.items.Item;
 import org.openhab.core.types.Command;
 import org.openhab.core.types.State;
