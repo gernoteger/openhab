@@ -14,15 +14,10 @@ import org.slf4j.LoggerFactory;
  * @author gernot
  * 
  */
-public class Items {
+public abstract class AbstractItems {
 
-	protected static final Logger logger = LoggerFactory.getLogger(Items.class);
-
-	/**
-	 * singleton constructor
-	 */
-	private Items() {
-	}
+	protected static final Logger logger = LoggerFactory
+			.getLogger(AbstractItems.class);
 
 	public static ItemRegistry getItemRegistry() {
 		return RulesActivator.itemRegistryTracker.getService();

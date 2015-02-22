@@ -1,12 +1,16 @@
 package org.openhab.action.javarule.internal.rule;
 
+import static org.openhab.action.javarule.internal.rule.Items.gLichtSchlafzimmer;
+import static org.openhab.action.javarule.internal.rule.Items.gLichtWohnzimmer;
+import static org.openhab.action.javarule.internal.rule.Items.sceneSchlafzimmer;
+import static org.openhab.action.javarule.internal.rule.Items.sceneWohnzimmer;
+
 import java.util.HashMap;
 import java.util.Map;
 
-import org.openhab.action.hue.internal.Rule;
+import org.openhab.action.javarule.internal.GenericRule;
 import org.openhab.core.items.Item;
 import org.openhab.core.types.Command;
-import org.openhab.core.types.State;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -16,7 +20,7 @@ import org.slf4j.LoggerFactory;
  * @author gernot
  * 
  */
-public class HueRule extends ItemsRule {
+public class HueRule extends GenericRule {
 	protected static final Logger logger = LoggerFactory
 			.getLogger(HueRule.class);
 
@@ -140,19 +144,4 @@ public class HueRule extends ItemsRule {
 		sendCommand(group.getName(), cmd);
 		logger.debug("state of item {} is now {}", item, item.getState());
 	}
-
-	@Override
-	public void stateUpdated(Item item, State state) throws Exception {
-		super.stateUpdated(item, state);
-
-		/**
-		 * handle tap rules
-		 */
-		if (item.equals(Tap_1_1)) {
-			logger.debug("pressed {}", item);
-
-			Rule r = new Rule();
-		}
-	}
-
 }

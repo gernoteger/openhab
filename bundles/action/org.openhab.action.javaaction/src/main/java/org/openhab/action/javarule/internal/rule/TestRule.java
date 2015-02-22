@@ -8,14 +8,13 @@
  */
 package org.openhab.action.javarule.internal.rule;
 
-import org.openhab.action.javarule.internal.Items;
+import static org.openhab.action.javarule.internal.rule.Items.*;
+
+import org.openhab.action.javarule.internal.GenericRule;
 import org.openhab.core.items.Item;
 import org.openhab.core.types.Command;
-import org.openhab.core.types.State;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-//import static org.openhab.action.javarule.internal.Items.*;
 
 /**
  * Implements a generic class for rules; does all the necessary registration and
@@ -24,7 +23,7 @@ import org.slf4j.LoggerFactory;
  * @author gernot
  * 
  */
-public class TestRule extends ItemsRule {
+public class TestRule extends GenericRule {
 	protected static final Logger logger = LoggerFactory
 			.getLogger(TestRule.class);
 
@@ -43,46 +42,12 @@ public class TestRule extends ItemsRule {
 			// logger.info("items: \n{}", items);
 
 			// gHue.getState();
-			// String off = OnOffType.OFF.name();
 			// postUpdate(Tap_1_1.getName(), off);
 
 			sendCommand(Color_1.getName(), "ON");
+
 			break;
 		}
 	}
 
-	@Override
-	public void stateChanged(Item item, State oldState, State newState)
-			throws Exception {
-		logger.debug("stateChanged({},{},{}) ", item.getName(), oldState,
-				newState);
-
-	}
-
-	@Override
-	public void onStartup() throws Exception {
-		logger.debug("onStartup()");
-	}
-
-	/**
-	 * create a List of Items for inclusion
-	 * 
-	 * @return
-	 */
-	String generateItemList() {
-		final StringBuilder items = new StringBuilder();
-		final String eol = "\n";
-		final String intend = "  ";
-		final String modifier = ""; // "static final "
-
-		items.append("{" + eol);
-		for (Item item : Items.allItems()) {
-			items.append(intend + modifier + item.getClass().getSimpleName()
-					+ " " + item.getName());
-			items.append("= item(\"" + item.getName() + "\");");
-			items.append(eol);
-		}
-		items.append("}" + eol);
-		return items.toString();
-	}
 }

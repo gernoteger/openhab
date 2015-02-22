@@ -1,6 +1,9 @@
 package org.openhab.action.javarule.internal.rule;
 
+import static org.openhab.action.javarule.internal.rule.Items.Tap_1_1;
+
 import org.openhab.action.hue.internal.Rule;
+import org.openhab.action.javarule.internal.GenericRule;
 import org.openhab.core.items.Item;
 import org.openhab.core.types.Command;
 import org.openhab.core.types.State;
@@ -13,7 +16,7 @@ import org.slf4j.LoggerFactory;
  * @author gernot
  * 
  */
-public class TapRule extends ItemsRule {
+public class TapRule extends GenericRule {
 	protected static final Logger logger = LoggerFactory
 			.getLogger(TapRule.class);
 
@@ -53,8 +56,8 @@ public class TapRule extends ItemsRule {
 		if (item.equals(Tap_1_1)) {
 			logger.debug("pressed {}", item);
 
-			Rule r = new Rule();
+			Rule r = new Rule("me");
+
 		}
 	}
-
 }

@@ -42,10 +42,11 @@ public interface Rule {
 	public void receiveCommand(Item item, Command command) throws Exception;
 
 	/**
-	 * called when module ist started or reconfigured. TODO: clarify that
+	 * called when module is started or reconfigured. Can be called multiple
+	 * times!
 	 * 
 	 * @throws Exception
 	 */
-	public void onStartup() throws Exception;
+	public void reconfigure() throws Exception;
 
 }

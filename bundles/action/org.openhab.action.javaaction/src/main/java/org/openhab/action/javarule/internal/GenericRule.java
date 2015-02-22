@@ -9,6 +9,12 @@ import org.openhab.core.types.Type;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * Saves as the Base Class for all user-implemented Rules
+ * 
+ * @author gernot
+ * 
+ */
 public class GenericRule implements Rule {
 
 	protected static final Logger logger = LoggerFactory
@@ -24,7 +30,7 @@ public class GenericRule implements Rule {
 	@Override
 	public void stateChanged(Item item, State oldState, State newState)
 			throws Exception {
-		logger.debug("stateChanged({},{},{}) ", item.getName(), oldState,
+		logger.trace("stateChanged({},{},{}) ", item.getName(), oldState,
 				newState);
 	}
 
@@ -33,7 +39,7 @@ public class GenericRule implements Rule {
 	 */
 	@Override
 	public void stateUpdated(Item item, State state) throws Exception {
-		logger.debug("stateUpdated({},{}) ", item.getName(), state.toString());
+		logger.trace("stateUpdated({},{}) ", item.getName(), state.toString());
 	}
 
 	/**
@@ -41,7 +47,7 @@ public class GenericRule implements Rule {
 	 */
 	@Override
 	public void receiveCommand(Item item, Command command) throws Exception {
-		logger.debug("receiveCommand({},{}) ", item.getName(), command);
+		logger.trace("receiveCommand({},{}) ", item.getName(), command);
 
 	}
 
@@ -49,8 +55,8 @@ public class GenericRule implements Rule {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void onStartup() throws Exception {
-		logger.debug("onStartup()");
+	public void reconfigure() throws Exception {
+		logger.trace("reconfigure()");
 
 	}
 
@@ -60,9 +66,8 @@ public class GenericRule implements Rule {
 	 * @param itemName
 	 * @return
 	 */
-	@SuppressWarnings("unchecked")
 	public static <T> T item(String itemName) {
-		return Items.item(itemName);
+		return AbstractItems.item(itemName);
 	}
 
 	/**

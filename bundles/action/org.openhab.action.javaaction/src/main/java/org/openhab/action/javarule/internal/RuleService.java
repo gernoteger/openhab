@@ -7,6 +7,7 @@ import java.util.Collection;
 import java.util.Dictionary;
 
 import org.apache.commons.lang.StringUtils;
+import org.openhab.action.javarule.internal.rule.Items;
 import org.openhab.action.javarule.internal.rule.Rules;
 import org.openhab.core.items.GenericItem;
 import org.openhab.core.items.Item;
@@ -39,6 +40,9 @@ public class RuleService extends AbstractActiveService implements
 		super();
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public void activate() {
 		// now add all registered items to the session
@@ -53,8 +57,13 @@ public class RuleService extends AbstractActiveService implements
 		Rules.registerRules();
 
 		setProperlyConfigured(true);
+
+		reconfigure();
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public void deactivate() {
 
@@ -112,6 +121,7 @@ public class RuleService extends AbstractActiveService implements
 		}
 
 		Rules.registerRules();
+		reconfigure();
 	}
 
 	/**
@@ -194,6 +204,32 @@ public class RuleService extends AbstractActiveService implements
 				}
 			}
 		} catch (ItemNotFoundException e) {
+		}
+	}
+
+	/**
+	 * will be called when Items are updated; can be called multiple times. If
+	 * properly configured, it will call the Rules' corresponding method
+	 * (possibly multiple times)
+	 */
+	private void reconfigure() {
+
+		if (isProperlyConfigured()) {
+
+			// Print code for Items Creation to Logfile
+			String items = ItemsGenerator.generateItemList();
+			logger.info("items: \n{}", items);
+
+			Items.setItems();
+
+			for (Rule rule : Rules.rules()) {
+				try {
+					rule.reconfigure();
+				} catch (Exception e) {
+					logger.warn("reconfigure {}  failed", rule.getClass()
+							.getName(), e);
+				}
+			}
 		}
 	}
 
