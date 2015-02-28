@@ -1,6 +1,5 @@
 package org.openhab.action.javarule.items;
 
-import org.openhab.core.items.ItemLookupException;
 import org.openhab.core.library.items.SwitchItem;
 import org.openhab.core.library.types.OnOffType;
 
@@ -12,7 +11,7 @@ import org.openhab.core.library.types.OnOffType;
  */
 public class SwitchItemProxy extends ItemProxy<SwitchItem, OnOffType> {
 
-	public SwitchItemProxy(String itemName) throws ItemLookupException {
+	public SwitchItemProxy(String itemName) {
 		super(itemName);
 	}
 

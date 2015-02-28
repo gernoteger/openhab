@@ -49,10 +49,6 @@ public class ItemsGenerator {
 		StringWriter delareWriter = new StringWriter();
 		PrintWriter dw = new PrintWriter(delareWriter, true);
 
-		// set
-		StringWriter setWriter = new StringWriter();
-		PrintWriter sw = new PrintWriter(setWriter, true);
-
 		dw.println("//==== copy code below ======");
 
 		// declare item variables
@@ -60,15 +56,11 @@ public class ItemsGenerator {
 			String itemType = proxyClass(item).getSimpleName();
 
 			String declare = intend + modifier + itemType + " "
-					+ item.getName() + ";";
-			String set = intend + intend + item.getName() + "= item(\""
+					+ item.getName() + "= new " + itemType + "(\""
 					+ item.getName() + "\");";
 
 			dw.println(declare);
-			sw.println(set);
 		}
-
-		sw.flush();
 
 		// create set part
 		dw.println();

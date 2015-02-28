@@ -16,7 +16,6 @@ import org.openhab.action.javarule.internal.GenericRule;
 import org.openhab.action.javarule.internal.ItemsGenerator;
 import org.openhab.action.javarule.items.ColorItemProxy;
 import org.openhab.core.items.Item;
-import org.openhab.core.items.ItemLookupException;
 import org.openhab.core.library.types.HSBType;
 import org.openhab.core.types.Command;
 import org.slf4j.Logger;
@@ -40,7 +39,7 @@ public class TestRule extends GenericRule {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void receiveCommand(Item item, Command command) {
+	public synchronized void receiveCommand(Item item, Command command) {
 		logger.debug("receiveCommand({},{}) ", item.getName(),
 				command.toString());
 
@@ -73,8 +72,9 @@ public class TestRule extends GenericRule {
 				// HSBType.RED
 				cp1.send(beach); // implies ON
 
-				Thread.sleep(1000);
 				cp1.send(OFF);
+
+				wait(1000);
 
 				// shouldn't be possible! will be ignored..
 				cp1.send(UP);
@@ -83,8 +83,6 @@ public class TestRule extends GenericRule {
 				Color_2.send(ON);
 				Color_3.send(ON);
 
-			} catch (ItemLookupException e) {
-				logger.warn("lookup failed", e);
 			} catch (InterruptedException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();

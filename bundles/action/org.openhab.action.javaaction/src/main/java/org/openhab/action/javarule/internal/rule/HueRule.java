@@ -6,7 +6,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.openhab.action.javarule.internal.GenericRule;
+import org.openhab.action.javarule.items.GroupItemProxy;
 import org.openhab.core.items.Item;
+import org.openhab.core.library.types.HSBType;
 import org.openhab.core.types.Command;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -66,12 +68,25 @@ public class HueRule extends GenericRule {
 	public void receiveCommand(Item item, Command command) throws Exception {
 		super.receiveCommand(item, command);
 
-		if (item.equals(sceneSchlafzimmer)) {
-			gLichtSchlafzimmer.send(command);
-		} else if (item.equals(sceneWohnzimmer)) {
-			gLichtWohnzimmer.send(command);
+		Integer newState = toInteger(command);
+
+		if (sceneSchlafzimmer.equals(item)) {
+			setGroupScene(gLichtSchlafzimmer, newState);
+		} else if (sceneWohnzimmer.equals(item)) {
+			setGroupScene(gLichtWohnzimmer, newState);
 		} else {
 			logger.debug("other item..");
 		}
+	}
+
+	/**
+	 * set values for a group..
+	 * 
+	 * @param group
+	 * @param newState
+	 */
+	private void setGroupScene(GroupItemProxy group, Integer newState) {
+		String cmd = commands.get(newState);
+		group.send(HSBType.valueOf(cmd));
 	}
 }

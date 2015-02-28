@@ -28,7 +28,7 @@ public class ItemProxy<T extends GenericItem, C extends Command> implements
 	protected static final Logger logger = LoggerFactory
 			.getLogger(ItemProxy.class);
 
-	private final T item;
+	private final String itemName;
 
 	/**
 	 * construct from Name
@@ -36,9 +36,9 @@ public class ItemProxy<T extends GenericItem, C extends Command> implements
 	 * @param itemName
 	 * @throws ItemLookupException
 	 */
-	public ItemProxy(String itemName) throws ItemLookupException {
+	public ItemProxy(String itemName) {
 		super();
-		item = getItem(itemName);
+		this.itemName = itemName;
 	}
 
 	/**
@@ -86,7 +86,7 @@ public class ItemProxy<T extends GenericItem, C extends Command> implements
 		EventPublisher publisher = RulesActivator.eventPublisherTracker
 				.getService();
 		if (publisher != null) {
-			publisher.sendCommand(item.getName(), command);
+			publisher.sendCommand(getItem().getName(), command);
 		} else {
 			logger.warn("EventPublisher not yet initialized");
 		}
@@ -98,46 +98,53 @@ public class ItemProxy<T extends GenericItem, C extends Command> implements
 	 * @param state
 	 */
 	public void setState(State state) {
-		item.setState(state);
+		getItem().setState(state);
 	}
 
 	@Override
 	public State getState() {
-		return item.getState();
+		return getItem().getState();
 	}
 
 	/**
 	 * return
 	 * 
 	 * @return real subject
+	 * @throws ItemLookupException
 	 */
 	public T getItem() {
-		return item;
+		try {
+			return getItem(itemName);
+		} catch (ItemLookupException e) {
+			// consume & produce runtime exception
+			throw new RuntimeException("couldn't find item '" + itemName + "'",
+					e);
+		}
 	}
 
 	@Override
 	public State getStateAs(Class<? extends State> typeClass) {
-		return item.getStateAs(typeClass);
+		return getItem().getStateAs(typeClass);
 	}
 
 	@Override
 	public String getName() {
-		return item.getName();
+		return getItem().getName();
 	}
 
 	@Override
 	public List<Class<? extends State>> getAcceptedDataTypes() {
-		return item.getAcceptedDataTypes();
+		return getItem().getAcceptedDataTypes();
 	}
 
 	@Override
 	public List<Class<? extends Command>> getAcceptedCommandTypes() {
-		return item.getAcceptedCommandTypes();
+		return getItem().getAcceptedCommandTypes();
 	}
 
 	@Override
 	public List<String> getGroupNames() {
-		return item.getGroupNames();
+		return getItem().getGroupNames();
 	}
 
 	/**
@@ -145,7 +152,7 @@ public class ItemProxy<T extends GenericItem, C extends Command> implements
 	 */
 	@Override
 	public int hashCode() {
-		return item.hashCode();
+		return getItem().hashCode();
 	}
 
 	/**
@@ -153,12 +160,12 @@ public class ItemProxy<T extends GenericItem, C extends Command> implements
 	 */
 	@Override
 	public boolean equals(Object obj) {
-		return item.equals(obj);
+		return getItem().equals(obj);
 	}
 
 	@Override
 	public String toString() {
-		return item.toString();
+		return getItem().toString();
 	}
 
 }
