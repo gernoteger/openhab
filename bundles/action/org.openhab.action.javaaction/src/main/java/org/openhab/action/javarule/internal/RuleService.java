@@ -1,13 +1,11 @@
 package org.openhab.action.javarule.internal;
 
-import static org.openhab.core.events.EventConstants.TOPIC_PREFIX;
-import static org.openhab.core.events.EventConstants.TOPIC_SEPERATOR;
+import static org.openhab.core.events.EventConstants.*;
 
 import java.util.Collection;
 import java.util.Dictionary;
 
 import org.apache.commons.lang.StringUtils;
-import org.openhab.action.javarule.internal.rule.Items;
 import org.openhab.action.javarule.internal.rule.Rules;
 import org.openhab.core.items.GenericItem;
 import org.openhab.core.items.Item;
@@ -219,8 +217,6 @@ public class RuleService extends AbstractActiveService implements
 			// Print code for Items Creation to Logfile
 			String items = ItemsGenerator.generateItemList();
 			logger.info("items: \n{}", items);
-
-			Items.setItems();
 
 			for (Rule rule : Rules.rules()) {
 				try {

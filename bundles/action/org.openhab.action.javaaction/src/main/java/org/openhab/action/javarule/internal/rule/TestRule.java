@@ -9,12 +9,21 @@
 package org.openhab.action.javarule.internal.rule;
 
 import static org.openhab.action.javarule.internal.rule.Items.*;
+import static org.openhab.core.library.types.OnOffType.*;
+import static org.openhab.core.library.types.UpDownType.*;
 
 import org.openhab.action.javarule.internal.GenericRule;
+import org.openhab.action.javarule.internal.ItemsGenerator;
+import org.openhab.action.javarule.items.ColorItemProxy;
 import org.openhab.core.items.Item;
+import org.openhab.core.items.ItemLookupException;
+import org.openhab.core.library.types.HSBType;
 import org.openhab.core.types.Command;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+//import static org.openhab.core.library.types.OnOffType.*;
+//import static org.openhab.action.javarule.internal.rule.Items.*;
 
 /**
  * Implements a generic class for rules; does all the necessary registration and
@@ -38,16 +47,50 @@ public class TestRule extends GenericRule {
 		switch (item.getName()) {
 		case "testJavaRule":
 			logger.info("test java");
-			// String items = generateItemList();
-			// logger.info("items: \n{}", items);
+			String items = ItemsGenerator.generateItemList();
+			logger.info("items: \n{}", items);
 
 			// gHue.getState();
 			// postUpdate(Tap_1_1.getName(), off);
 
-			sendCommand(Color_1.getName(), "ON");
+			// sendCommand(Color_1.getName(), "ON");
+
+			// Teststrecke für Proxires
+			try {
+				ColorItemProxy cp1 = new ColorItemProxy("Color_2");
+
+				// private static final String beach = "89.68681,18.82353,95";
+				// hue, saturation, value
+				// there's no nice Constuctor for that; no
+				// Colors are still somewhat clumsy to handle
+				// also transition times can't ´be handled with OpenHab API
+				HSBType beach = HSBType.valueOf("89.68681,18.82353,95");
+				// the same color
+				// HSBType beach1 = new HSBType(Color.getHSBColor(89.68681F /
+				// 360,
+				// 0.1882353F, 0.95F));
+
+				// HSBType.RED
+				cp1.send(beach); // implies ON
+
+				Thread.sleep(1000);
+				cp1.send(OFF);
+
+				// shouldn't be possible! will be ignored..
+				cp1.send(UP);
+
+				Color_1.send(ON);
+				Color_2.send(ON);
+				Color_3.send(ON);
+
+			} catch (ItemLookupException e) {
+				logger.warn("lookup failed", e);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 
 			break;
 		}
 	}
-
 }
