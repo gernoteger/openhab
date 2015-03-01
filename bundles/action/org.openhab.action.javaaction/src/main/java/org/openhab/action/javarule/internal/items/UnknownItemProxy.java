@@ -1,4 +1,4 @@
-package org.openhab.action.javarule.items;
+package org.openhab.action.javarule.internal.items;
 
 import org.openhab.core.items.GenericItem;
 import org.openhab.core.types.Command;
@@ -11,8 +11,8 @@ import org.openhab.core.types.Command;
  */
 public class UnknownItemProxy extends ItemProxy<GenericItem, Command> {
 
-	public UnknownItemProxy(String itemName) {
-		super(itemName);
-	}
+    public UnknownItemProxy(String itemName) {
+	super(itemName);
+    }
 
 }

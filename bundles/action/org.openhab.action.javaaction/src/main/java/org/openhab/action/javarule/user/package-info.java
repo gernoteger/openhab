@@ -17,4 +17,4 @@
  * @author gernoteger
  *
  */
-package org.openhab.action.javarule.internal.rule;
+package org.openhab.action.javarule.user;

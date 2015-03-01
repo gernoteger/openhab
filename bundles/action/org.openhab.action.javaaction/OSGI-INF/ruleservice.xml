@@ -10,7 +10,7 @@
 
 -->
 <scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0" activate="activate" deactivate="deactivate" name="org.openhab.action.javarulesservice">
-   <implementation class="org.openhab.action.javarule.internal.RuleService"/>
+   <implementation class="org.openhab.action.javarule.user.RuleService"/>
    <service>
       <provide interface="org.osgi.service.cm.ManagedService"/>
       <provide interface="org.osgi.service.event.EventHandler"/>
