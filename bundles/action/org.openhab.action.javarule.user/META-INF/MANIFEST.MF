@@ -1,0 +1,27 @@
+Manifest-Version: 1.0
+Private-Package: org.openhab.action.javarule.internal
+Ignore-Package: org.openhab.action.javarule.internal
+Bundle-Name: openHAB Rule in Java
+Bundle-Vendor: openHAB.org
+Bundle-Version: 1.7.0.qualifier
+Bundle-Activator: org.openhab.action.javarule.user.RuleActivator
+Bundle-ManifestVersion: 2
+Eclipse-BuddyPolicy: registered
+Bundle-License: http://www.eclipse.org/legal/epl-v10.html
+Bundle-Description: This is the rule support of the open Home Aut
+ omation Bus (openHAB)
+Import-Package: org.openhab.action.javarule.internal,
+ org.openhab.action.javarule.internal.items,
+ org.openhab.action.javarule.osgi,
+ org.openhab.core.items,
+ org.openhab.core.library.types,
+ org.openhab.core.types,
+ org.osgi.framework;version="1.7.0",
+ org.osgi.service.event;version="1.3.0",
+ org.slf4j
+Bundle-SymbolicName: org.openhab.action.javarule.user
+Bundle-DocURL: http://www.openhab.org
+Bundle-RequiredExecutionEnvironment: J2SE-1.5
+Service-Component: OSGI-INF/ruleservice.xml
+Bundle-ClassPath: .
+Export-Package: org.openhab.action.javarule.user
