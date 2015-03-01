@@ -117,7 +117,7 @@ public abstract class AbstractRuleService extends AbstractActiveService
      */
     @Override
     public void allItemsChanged(Collection<String> oldItemNames) {
-	logger.info("allItemsChanged: count=" + oldItemNames.size());
+	logger.debug("allItemsChanged: count=" + oldItemNames.size());
 	// first remove all previous items from the session
 	for (String oldItemName : oldItemNames) {
 	    try {
@@ -142,7 +142,7 @@ public abstract class AbstractRuleService extends AbstractActiveService
      */
     @Override
     public void itemAdded(Item item) {
-	logger.info("itemAdded: " + item.getName());
+	logger.debug("itemAdded: " + item.getName());
 
 	internalItemAdded(item);
 
@@ -165,7 +165,7 @@ public abstract class AbstractRuleService extends AbstractActiveService
      */
     @Override
     public void stateChanged(Item item, State oldState, State newState) {
-	logger.info("stateChanged({},{},{}) ", item.getName(), oldState,
+	logger.trace("stateChanged({},{},{}) ", item.getName(), oldState,
 		newState);
 	for (Rule rule : rules) {
 	    try {
@@ -187,7 +187,7 @@ public abstract class AbstractRuleService extends AbstractActiveService
      */
     @Override
     public void stateUpdated(Item item, State state) {
-	logger.info("stateUpdated({},{}) ", item.getName(), state.toString());
+	logger.trace("stateUpdated({},{}) ", item.getName(), state.toString());
 
 	for (Rule rule : rules) {
 	    try {
@@ -204,7 +204,7 @@ public abstract class AbstractRuleService extends AbstractActiveService
      * handle a command from the event handler
      */
     private void receiveCommand(String itemName, Command command) {
-	logger.debug("receiveCommand({},{}) ", itemName, command.toString());
+	logger.trace("receiveCommand({},{}) ", itemName, command.toString());
 	try {
 	    Item item = itemRegistry.getItem(itemName);
 	    // receiveCommand(item, command);
@@ -293,7 +293,7 @@ public abstract class AbstractRuleService extends AbstractActiveService
      */
     @Override
     public void handleEvent(Event event) {
-	logger.info("handleEvent({}) ", event.toString());
+	logger.debug("handleEvent({}) ", event.toString());
 
 	String itemName = (String) event.getProperty("item");
 

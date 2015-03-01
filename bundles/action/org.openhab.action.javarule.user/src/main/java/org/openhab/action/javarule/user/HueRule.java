@@ -65,16 +65,10 @@ public class HueRule extends GenericRule {
 
     @Override
     public void receiveCommand(Item item, Command command) throws Exception {
-	super.receiveCommand(item, command);
-
-	Integer newState = toInteger(command);
-
 	if (sceneSchlafzimmer.equals(item)) {
-	    setGroupScene(gLichtSchlafzimmer, newState);
+	    setGroupScene(gLichtSchlafzimmer, command);
 	} else if (sceneWohnzimmer.equals(item)) {
-	    setGroupScene(gLichtWohnzimmer, newState);
-	} else {
-	    logger.debug("other item..");
+	    setGroupScene(gLichtWohnzimmer, command);
 	}
     }
 
@@ -84,7 +78,8 @@ public class HueRule extends GenericRule {
      * @param group
      * @param newState
      */
-    private void setGroupScene(GroupItemProxy group, Integer newState) {
+    private void setGroupScene(GroupItemProxy group, Command command) {
+	Integer newState = toInteger(command);
 	String commandString = commands.get(newState);
 	Command c = group.parseCommand(commandString);
 
