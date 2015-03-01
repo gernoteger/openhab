@@ -30,7 +30,8 @@
     <module>org.openhab.action.openwebif</module>
     <module>org.openhab.action.weather</module>
     <module>org.openhab.action.astro</module>
-   <module>org.openhab.action.javaaction</module>
+    <module>org.openhab.action.javarule</module>
+	<module>org.openhab.action.javarule.user</module>
 	
   </modules>
 
