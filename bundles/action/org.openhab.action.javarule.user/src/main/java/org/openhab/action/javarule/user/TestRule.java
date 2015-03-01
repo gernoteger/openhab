@@ -39,7 +39,7 @@ public class TestRule extends GenericRule {
      * {@inheritDoc}
      */
     @Override
-    public synchronized void receiveCommand(Item item, Command command) {
+    public void receiveCommand(Item item, Command command) {
 	logger.debug("receiveCommand({},{}) ", item.getName(),
 		command.toString());
 
@@ -74,7 +74,7 @@ public class TestRule extends GenericRule {
 
 		cp1.send(OFF);
 
-		wait(1000);
+		Thread.sleep(1000);
 
 		// shouldn't be possible! will be ignored..
 		cp1.send(UP);

@@ -10,22 +10,18 @@ Eclipse-BuddyPolicy: registered
 Bundle-License: http://www.eclipse.org/legal/epl-v10.html
 Bundle-Description: This is the rule support of the open Home Aut
  omation Bus (openHAB)
-Import-Package: org.apache.commons.lang,
- org.openhab.action.hue.internal,
- org.openhab.core.events,
+Import-Package: org.openhab.action.javarule.internal,
+ org.openhab.action.javarule.internal.items,
+ org.openhab.action.javarule.osgi,
  org.openhab.core.items,
- org.openhab.core.library.items,
  org.openhab.core.library.types,
- org.openhab.core.service,
  org.openhab.core.types,
- org.osgi.framework,
- org.osgi.service.cm,
- org.osgi.service.event,
- org.osgi.util.tracker,
+ org.osgi.framework;version="1.7.0",
+ org.osgi.service.event;version="1.3.0",
  org.slf4j
-Bundle-SymbolicName: org.openhab.action.javarule
+Bundle-SymbolicName: org.openhab.action.javarule.user
 Bundle-DocURL: http://www.openhab.org
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Service-Component: OSGI-INF/ruleservice.xml
 Bundle-ClassPath: .
-Export-Package: org.openhab.action.javarule.osgi
+Export-Package: org.openhab.action.javarule.user
