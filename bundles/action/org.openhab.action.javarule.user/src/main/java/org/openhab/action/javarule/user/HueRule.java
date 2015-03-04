@@ -65,9 +65,9 @@ public class HueRule extends GenericRule {
 
     @Override
     public void receiveCommand(Item item, Command command) throws Exception {
-	if (sceneSchlafzimmer.equals(item)) {
+	if (sceneSchlafzimmer.isEqual(item)) {
 	    setGroupScene(gLichtSchlafzimmer, command);
-	} else if (sceneWohnzimmer.equals(item)) {
+	} else if (sceneWohnzimmer.isEqual(item)) {
 	    setGroupScene(gLichtWohnzimmer, command);
 	}
     }

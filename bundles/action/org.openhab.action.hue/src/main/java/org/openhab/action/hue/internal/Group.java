@@ -5,8 +5,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.codehaus.jackson.annotate.JsonIgnore;
-import org.codehaus.jackson.annotate.JsonProperty;
-import org.openhab.action.hue.AbstractHueResource;
 
 public class Group extends AbstractHueResource {
 
@@ -28,9 +26,6 @@ public class Group extends AbstractHueResource {
 		this.lights = lights;
 	}
 
-	@JsonProperty
-	String name;	
-	
 	/**
 	 * create Rule from json description
 	 * @param json
@@ -38,7 +33,7 @@ public class Group extends AbstractHueResource {
 	 * @throws IOException 
 	 */
 	@JsonIgnore
-	public static Group create(String json) throws IOException{		
-		return (Group) create(json,Group.class);		
+	public static AbstractHueResource create(String json) throws IOException{		
+		return (AbstractHueResource) create(json,Group.class);		
 	}
 }

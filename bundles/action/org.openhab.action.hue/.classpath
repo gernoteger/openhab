@@ -160,7 +160,7 @@
 	<classpathentry kind="lib" path="C:/dev/openHAB/openhab_contributions/bundles/io/org.openhab.io.rest.lib/lib/atmosphere-runtime-2.0.9.jar"/>
 	<classpathentry kind="lib" path="C:/dev/openHAB/openhab_contributions/bundles/io/org.openhab.io.rest.lib/lib/jackson-core-asl-1.9.2.jar"/>
 	<classpathentry kind="lib" path="C:/dev/openHAB/openhab_contributions/bundles/io/org.openhab.io.rest.lib/lib/jackson-jaxrs-1.9.2.jar"/>
-	<classpathentry kind="lib" path="C:/dev/openHAB/openhab_contributions/bundles/io/org.openhab.io.rest.lib/lib/jackson-mapper-asl-1.9.2.jar"/>
+	<classpathentry kind="lib" path="C:/dev/openHAB/openhab_contributions/bundles/io/org.openhab.io.rest.lib/lib/jackson-mapper-asl-1.9.2.jar" sourcepath="C:/Users/gernot/.m2/repository/org/codehaus/jackson/jackson-mapper-asl/1.9.2/jackson-mapper-asl-1.9.2-sources.jar"/>
 	<classpathentry kind="lib" path="C:/dev/openHAB/openhab_contributions/bundles/io/org.openhab.io.rest.lib/lib/jackson-xc-1.9.2.jar"/>
 	<classpathentry kind="lib" path="C:/dev/openHAB/openhab_contributions/bundles/io/org.openhab.io.rest.lib/lib/jersey-client-1.17.1.jar"/>
 	<classpathentry kind="lib" path="C:/dev/openHAB/openhab_contributions/bundles/io/org.openhab.io.rest.lib/lib/jersey-core-1.17.1.jar"/>

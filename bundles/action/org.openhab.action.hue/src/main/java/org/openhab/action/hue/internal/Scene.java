@@ -3,7 +3,6 @@ package org.openhab.action.hue.internal;
 import java.util.List;
 
 import org.codehaus.jackson.annotate.JsonProperty;
-import org.openhab.action.hue.AbstractHueResource;
 
 /**
  * represents a Scene
@@ -11,9 +10,6 @@ import org.openhab.action.hue.AbstractHueResource;
  *
  */
 public class Scene extends AbstractHueResource {
-	@JsonProperty
-	String name;
-	
 	@JsonProperty
 	List<String> lights;
 

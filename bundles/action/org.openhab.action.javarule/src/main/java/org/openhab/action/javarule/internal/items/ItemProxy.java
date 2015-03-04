@@ -206,10 +206,11 @@ public class ItemProxy<T extends GenericItem, C extends Command> implements
     }
 
     /**
-     * equals is tlken from item, so the proxy behaves like the Item
+     * similar to equals; can't override equals, since I would break the
+     * {@link #equals(Object)} contract regarding symmetry due to the
+     * implementation of {@link GenericItem#equals(Object)} {@link }.
      */
-    @Override
-    public boolean equals(Object obj) {
+    public boolean isEqual(Item obj) {
 	return getItem().equals(obj);
     }
 

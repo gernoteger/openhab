@@ -13,7 +13,6 @@ import java.util.Dictionary;
 import java.util.HashMap;
 import java.util.Map;
 
-
 import org.apache.commons.lang.StringUtils;
 import org.openhab.binding.hue.HueBindingProvider;
 import org.openhab.binding.hue.internal.HueLightBindingConfig.BindingType;
@@ -49,314 +48,343 @@ import org.slf4j.LoggerFactory;
  * @author Jos Schering
  * @since 1.2.0
  */
-public class HueBinding extends AbstractActiveBinding<HueBindingProvider> implements ManagedService {
+public class HueBinding extends AbstractActiveBinding<HueBindingProvider>
+	implements ManagedService {
 
-	static final Logger logger = LoggerFactory.getLogger(HueBinding.class);
+    static final Logger logger = LoggerFactory.getLogger(HueBinding.class);
 
-	/** refresh interval is only set by configuration */
-	private long refreshInterval;
-	
-	private HueContext context=HueContext.getInstance();
-	
-	private HueBridge activeBridge = null;
-	private String bridgeIP = null;
-	private String bridgeSecret = "openHAB";
+    /** refresh interval is only set by configuration */
+    private long refreshInterval;
 
-	// Caches all bulbs controlled to prevent the recreation of the bulbs which
-	// triggers a rereading of the settings from the bridge which is very
-	// expensive.
-	private HashMap<Integer, HueBulb> bulbCache = new HashMap<Integer, HueBulb>();
+    private final HueContext context = HueContext.getInstance();
 
-	private HueTapStatesHandler tapStates=new HueTapStatesHandler();
-	
-	
+    private HueBridge activeBridge = null;
+    private String bridgeIP = null;
+    private String bridgeSecret = "openHAB";
 
-	/**
-     * @{inheritDoc}
+    // Caches all bulbs controlled to prevent the recreation of the bulbs which
+    // triggers a rereading of the settings from the bridge which is very
+    // expensive.
+    private final HashMap<Integer, HueBulb> bulbCache = new HashMap<Integer, HueBulb>();
+
+    private final HueTapStatesHandler tapStates = new HueTapStatesHandler();
+
+    /**
+     * @{inheritDoc
      */
     @Override
     protected long getRefreshInterval() {
-    	return refreshInterval;
+	return refreshInterval;
     }
-    
-	/**
-     * @{inheritDoc}
+
+    /**
+     * @{inheritDoc
      */
     @Override
     protected String getName() {
-    	return "Hue Refresh Service";
+	return "Hue Refresh Service";
     }
-    
-	/**
-	 * Get current hue settings of the bulbs and update the items that are connected with the bulb.
-	 * The refreshinterval determines the polling frequency.
-	 */
-	@Override
-	public void execute() {
-		if (activeBridge != null)
-		{
-			// Get settings and update the bulbs
-			// Observation : If the power of a hue lamp is removed, the status is not updated in hue hub.
-			// The heartbeat functionality should fix this, but 
-			HueSettings settings = activeBridge.getSettings();
-			if(settings==null){
-				logger.warn("no valid settings found");
-				return;
-			}
-			Map<Integer, HueTapState> pressedTaps = tapStates.findPressedTapDevices(settings);
 
-			if(pressedTaps.size()>0){
-				logger.debug("pressed "+pressedTaps.size()+" taps");
-				
-			}
-			
-			for (int i = 1; i <= settings.getLightsCount(); i++) {
-				HueBulb bulb = bulbCache.get(i);
-				if (bulb == null) {
-					bulb = new HueBulb(activeBridge, i);
-					bulbCache.put(i, bulb);
-				}
-				bulb.getStatus(settings);
-			}
-			
-			// Update the items that are linked with the bulbs.
-			// Multiple items of different types can be linked to one bulb.
-			for (HueBindingProvider provider : this.providers) {
-				for (String hueItemName : provider.getInBindingItemNames()) {
-					AbstractHueBindingConfig deviceConfig = getConfigForItemName(hueItemName);
-					
-					if (deviceConfig != null) {
-						
-						if(deviceConfig instanceof HueLightBindingConfig){
-							executeBulb(hueItemName, (HueLightBindingConfig) deviceConfig);
-						}else if(deviceConfig instanceof HueTapBindingConfig){
-							executeTap( hueItemName, (HueTapBindingConfig) deviceConfig,pressedTaps);
-						}
-					}
-				}
-			}
+    /**
+     * Get current hue settings of the bulbs and update the items that are
+     * connected with the bulb. The refreshinterval determines the polling
+     * frequency.
+     */
+    @Override
+    public void execute() {
+	if (activeBridge != null) {
+	    // Get settings and update the bulbs
+	    // Observation : If the power of a hue lamp is removed, the status
+	    // is not updated in hue hub.
+	    // The heartbeat functionality should fix this, but
+	    HueSettings settings = activeBridge.getSettings();
+	    if (settings == null) {
+		logger.warn("no valid settings found");
+		return;
+	    }
+	    Map<Integer, HueTapState> pressedTaps = tapStates
+		    .findPressedTapDevices(settings);
+
+	    if (pressedTaps.size() > 0) {
+		logger.debug("pressed " + pressedTaps.size() + " taps");
+
+	    }
+
+	    for (int i = 1; i <= settings.getLightsCount(); i++) {
+		HueBulb bulb = bulbCache.get(i);
+		if (bulb == null) {
+		    bulb = new HueBulb(activeBridge, i);
+		    bulbCache.put(i, bulb);
 		}
+		bulb.getStatus(settings);
+	    }
+
+	    // Update the items that are linked with the bulbs.
+	    // Multiple items of different types can be linked to one bulb.
+	    for (HueBindingProvider provider : this.providers) {
+		for (String hueItemName : provider.getInBindingItemNames()) {
+		    AbstractHueBindingConfig deviceConfig = getConfigForItemName(hueItemName);
+
+		    if (deviceConfig != null) {
+
+			if (deviceConfig instanceof HueLightBindingConfig) {
+			    executeBulb(hueItemName,
+				    (HueLightBindingConfig) deviceConfig);
+			} else if (deviceConfig instanceof HueTapBindingConfig) {
+			    executeTap(hueItemName,
+				    (HueTapBindingConfig) deviceConfig,
+				    pressedTaps);
+			}
+		    }
+		}
+	    }
 	}
-	
-	
-	
-	
-	
-	/**
-	 * check if this config is among the pressed ones and act accordingly
-	 * @param hueItemName
-	 * @param deviceConfig
-	 * @param pressedTaps
-	 */
-	private void executeTap(String hueItemName, HueTapBindingConfig deviceConfig,Map<Integer,HueTapState> pressedTaps) {
-		
-		// has this tap device changed?
-		HueTapState pressed=pressedTaps.get(deviceConfig.deviceNumber);
-		if(pressed!=null){
-			SwitchId id=deviceConfig.switchId;
-			if(pressed.getButtonEvent()==id.getButtonEvent()){
-				eventPublisher.postCommand(hueItemName, OnOffType.ON);
-			}
-		}
-		
-		
-	}
-	
-	/**
-	 * execute settings operations on a bulb
-	 * @param hueItemName
-	 * @param deviceConfig
-	 */
-	private void executeBulb(String hueItemName, HueLightBindingConfig deviceConfig) {
-		// Handle Bulbs
-		HueBulb bulb = bulbCache.get(deviceConfig.getDeviceNumber());
-		if (bulb != null) {
-			
-			// Enhancement: only send a postUpdate for items that have changed.
-			// Tried to use item.getState() as found in enOcean binding, but the state value was always uninitialized
-			// State actualState = provider.getItem(itemName).getState(); --> always return Uninitialized
-			// Workaround for now, store the OnOff state in deviceConfig 
-			//
-			if ((bulb.getIsOn() == true) && (bulb.getIsReachable() == true)) {
-				if ((deviceConfig.itemStateOnOffType == null) || (deviceConfig.itemStateOnOffType.equals(OnOffType.ON) == false)) {
-					eventPublisher.postUpdate(hueItemName, OnOffType.ON);
-					deviceConfig.itemStateOnOffType = OnOffType.ON;
-				}
-			} else { 
-				if ((deviceConfig.itemStateOnOffType == null) || (deviceConfig.itemStateOnOffType.equals(OnOffType.OFF) == false)) {
-					eventPublisher.postUpdate(hueItemName, OnOffType.OFF);
-					deviceConfig.itemStateOnOffType = OnOffType.OFF;
-				}
-			}
-			
-			if (deviceConfig.getType().equals(BindingType.brightness)) {
-				if ((bulb.getIsOn() == true) && (bulb.getIsReachable() == true)) {
-					// Only postUpdate when bulb is on, otherwise dimmer item is not retaining state and shows to max brightness value
-					PercentType newPercent = new PercentType((int)Math.round((bulb.getBrightness() * (double)100) / (double)255));
-					if ((deviceConfig.itemStatePercentType == null) || (deviceConfig.itemStatePercentType.equals(newPercent) == false)) {
-						eventPublisher.postUpdate(hueItemName, newPercent);
-						deviceConfig.itemStatePercentType = newPercent;
-					}
-				}									
-			} else if (deviceConfig.getType().equals(BindingType.rgb)) {
-				if ((bulb.getIsOn() == true) && (bulb.getIsReachable() == true)) {
-					// Only postUpdate when bulb is on, otherwise color item is not retaining state and shows to max brightness value
-					DecimalType decimalHue = new DecimalType(bulb.getHue() / (double)182);
-					PercentType percentBrightness = new PercentType((int)Math.round((bulb.getBrightness() * (double)100) / (double)255));
-					PercentType percentSaturation = new PercentType((int)Math.round((bulb.getSaturation() * (double)100) / (double)255));
-					HSBType newHsb = new HSBType(decimalHue, percentSaturation, percentBrightness);
-					if ((deviceConfig.itemStateHSBType == null) || (deviceConfig.itemStateHSBType.equals(newHsb) == false)) {
-						eventPublisher.postUpdate(hueItemName, newHsb);
-						deviceConfig.itemStateHSBType = newHsb;
-					}
-				}									
-			}
-		}
-	}
-	
-	@Override
-	public void internalReceiveCommand(String itemName, Command command) {
-		super.internalReceiveCommand(itemName, command);
+    }
 
-		logger.debug("Hue binding received command '" + command
-				+ "' for item '" + itemName + "'");
+    /**
+     * check if this config is among the pressed ones and act accordingly
+     * 
+     * @param hueItemName
+     * @param deviceConfig
+     * @param pressedTaps
+     */
+    private void executeTap(String hueItemName,
+	    HueTapBindingConfig deviceConfig,
+	    Map<Integer, HueTapState> pressedTaps) {
 
-		if (activeBridge != null) {
-			computeCommandForItemOnBridge(command, itemName, activeBridge);
-		} else {
-			logger.warn("Hue binding skipped command because no Hue bridge is connected.");
-		}
-
+	// has this tap device changed?
+	HueTapState pressed = pressedTaps.get(deviceConfig.deviceNumber);
+	if (pressed != null) {
+	    SwitchId id = deviceConfig.switchId;
+	    if (pressed.getButtonEvent() == id.getButtonEvent()) {
+		eventPublisher.postCommand(hueItemName, OnOffType.ON);
+	    }
 	}
 
-	/**
-	 * Checks whether the command is for one of the configured Hue bulbs. If
-	 * this is the case, the command is translated to the corresponding action
-	 * which is then sent to the given bulb.
-	 * 
-	 * @param command
-	 *            The command from the openHAB bus.
-	 * @param itemName
-	 *            The name of the targeted item.
-	 * @param bridge
-	 *            The Hue bridge the Hue bulb is connected to
-	 */
-	private void computeCommandForItemOnBridge(Command command,
-			String itemName, HueBridge bridge) {
-		
-		AbstractHueBindingConfig abstractDeviceConfig = getConfigForItemName(itemName);
-		if (abstractDeviceConfig == null) {
-			return;
+    }
+
+    /**
+     * execute settings operations on a bulb
+     * 
+     * @param hueItemName
+     * @param deviceConfig
+     */
+    private void executeBulb(String hueItemName,
+	    HueLightBindingConfig deviceConfig) {
+	// Handle Bulbs
+	HueBulb bulb = bulbCache.get(deviceConfig.getDeviceNumber());
+	if (bulb != null) {
+
+	    // Enhancement: only send a postUpdate for items that have changed.
+	    // Tried to use item.getState() as found in enOcean binding, but the
+	    // state value was always uninitialized
+	    // State actualState = provider.getItem(itemName).getState(); -->
+	    // always return Uninitialized
+	    // Workaround for now, store the OnOff state in deviceConfig
+	    //
+	    if ((bulb.getIsOn() == true) && (bulb.getIsReachable() == true)) {
+		if ((deviceConfig.itemStateOnOffType == null)
+			|| (deviceConfig.itemStateOnOffType
+				.equals(OnOffType.ON) == false)) {
+		    eventPublisher.postUpdate(hueItemName, OnOffType.ON);
+		    deviceConfig.itemStateOnOffType = OnOffType.ON;
 		}
-		
-		if(abstractDeviceConfig instanceof HueLightBindingConfig ){
-			HueLightBindingConfig deviceConfig = (HueLightBindingConfig)abstractDeviceConfig ;
-	
-	
-			HueBulb bulb = bulbCache.get(deviceConfig.getDeviceNumber());
-			if (bulb == null) {
-				bulb = new HueBulb(bridge, deviceConfig.getDeviceNumber());
-				bulbCache.put(deviceConfig.getDeviceNumber(), bulb);
-			}
-	
-			if (command instanceof OnOffType) {
-				bulb.switchOn(OnOffType.ON.equals(command));
-			}
-	
-			if (command instanceof HSBType) {
-				HSBType hsbCommand = (HSBType) command;
-				DecimalType hue = hsbCommand.getHue();
-				PercentType sat = hsbCommand.getSaturation();
-				PercentType bri = hsbCommand.getBrightness();
-				bulb.colorizeByHSB(hue.doubleValue() / 360,
-						sat.doubleValue() / 100, bri.doubleValue() / 100);
-			}
-	
-			if (deviceConfig.getType().equals(BindingType.brightness)
-					|| deviceConfig.getType().equals(BindingType.rgb)) {
-				if (IncreaseDecreaseType.INCREASE.equals(command)) {
-					int resultingValue = bulb.increaseBrightness(deviceConfig.getStepSize());
-					eventPublisher.postUpdate(itemName, new PercentType(resultingValue));
-				} else if (IncreaseDecreaseType.DECREASE.equals(command)) {
-					int resultingValue = bulb.decreaseBrightness(deviceConfig.getStepSize());
-					eventPublisher.postUpdate(itemName, new PercentType(resultingValue));
-				} else if ((command instanceof PercentType) && !(command instanceof HSBType)) {
-					bulb.setBrightness((int)Math.round((double)255 / (double)100 * ((PercentType) command).intValue()));
-				}
-			}
-	
-			if (deviceConfig.getType().equals(BindingType.colorTemperature)) {
-				if (IncreaseDecreaseType.INCREASE.equals(command)) {
-					bulb.increaseColorTemperature(deviceConfig.getStepSize());
-				} else if (IncreaseDecreaseType.DECREASE.equals(command)) {
-					bulb.decreaseColorTemperature(deviceConfig.getStepSize());
-				} else if (command instanceof PercentType) {
-					bulb.setColorTemperature((int)Math.round((((double)346 / (double)100) * ((PercentType) command).intValue()) + 154));
-				}
-			}
-		}else {
-			//do nothing for tap devices; my self-crated commands will arrive here 
-			//logger.warn("Item '"+itemName+"' is no hue bulb! Command ignored.");
+	    } else {
+		if ((deviceConfig.itemStateOnOffType == null)
+			|| (deviceConfig.itemStateOnOffType
+				.equals(OnOffType.OFF) == false)) {
+		    eventPublisher.postUpdate(hueItemName, OnOffType.OFF);
+		    deviceConfig.itemStateOnOffType = OnOffType.OFF;
 		}
+	    }
+
+	    if (deviceConfig.getType().equals(BindingType.brightness)) {
+		if ((bulb.getIsOn() == true) && (bulb.getIsReachable() == true)) {
+		    // Only postUpdate when bulb is on, otherwise dimmer item is
+		    // not retaining state and shows to max brightness value
+		    PercentType newPercent = new PercentType(
+			    (int) Math.round((bulb.getBrightness() * (double) 100) / 255));
+		    if ((deviceConfig.itemStatePercentType == null)
+			    || (deviceConfig.itemStatePercentType
+				    .equals(newPercent) == false)) {
+			eventPublisher.postUpdate(hueItemName, newPercent);
+			deviceConfig.itemStatePercentType = newPercent;
+		    }
+		}
+	    } else if (deviceConfig.getType().equals(BindingType.rgb)) {
+		if ((bulb.getIsOn() == true) && (bulb.getIsReachable() == true)) {
+		    // Only postUpdate when bulb is on, otherwise color item is
+		    // not retaining state and shows to max brightness value
+		    DecimalType decimalHue = new DecimalType(bulb.getHue()
+			    / (double) 182);
+		    PercentType percentBrightness = new PercentType(
+			    (int) Math.round((bulb.getBrightness() * (double) 100) / 255));
+		    PercentType percentSaturation = new PercentType(
+			    (int) Math.round((bulb.getSaturation() * (double) 100) / 255));
+		    HSBType newHsb = new HSBType(decimalHue, percentSaturation,
+			    percentBrightness);
+		    if ((deviceConfig.itemStateHSBType == null)
+			    || (deviceConfig.itemStateHSBType.equals(newHsb) == false)) {
+			eventPublisher.postUpdate(hueItemName, newHsb);
+			deviceConfig.itemStateHSBType = newHsb;
+		    }
+		}
+	    }
+	}
+    }
+
+    @Override
+    public void internalReceiveCommand(String itemName, Command command) {
+	super.internalReceiveCommand(itemName, command);
+
+	logger.debug("Hue binding received command '" + command
+		+ "' for item '" + itemName + "'");
+
+	if (activeBridge != null) {
+	    computeCommandForItemOnBridge(command, itemName, activeBridge);
+	} else {
+	    logger.warn("Hue binding skipped command because no Hue bridge is connected.");
 	}
 
-	/**
-	 * Lookup of the configuration of the named item.
-	 * 
-	 * @param itemName
-	 *            The name of the item.
-	 * @return The configuration, null otherwise.
-	 */
-	private AbstractHueBindingConfig getConfigForItemName(String itemName) {
-		for (HueBindingProvider provider : this.providers) {
-			if (provider.getItemConfig(itemName) != null) {
-				return provider.getItemConfig(itemName);
-			}
-		}
-		return null;
+    }
+
+    /**
+     * Checks whether the command is for one of the configured Hue bulbs. If
+     * this is the case, the command is translated to the corresponding action
+     * which is then sent to the given bulb.
+     * 
+     * @param command
+     *            The command from the openHAB bus.
+     * @param itemName
+     *            The name of the targeted item.
+     * @param bridge
+     *            The Hue bridge the Hue bulb is connected to
+     */
+    private void computeCommandForItemOnBridge(Command command,
+	    String itemName, HueBridge bridge) {
+
+	AbstractHueBindingConfig abstractDeviceConfig = getConfigForItemName(itemName);
+	if (abstractDeviceConfig == null) {
+	    return;
 	}
 
-	@SuppressWarnings("rawtypes")
-	@Override
-	public void updated(Dictionary config) throws ConfigurationException {
-		logger.debug("updated");
-		if (config != null) {
-			String ip = (String) config.get("ip");
-			if (StringUtils.isNotBlank(ip)) {
-				this.bridgeIP = ip;
-			} else {
-				try {
-					this.bridgeIP = new SsdpDiscovery()
-							.findIpForResponseKeywords("description.xml",
-									"FreeRTOS");
-				} catch (IOException e) {
-					logger.warn("Could not find hue bridge automatically. Please make sure it is switched on and connected to the same network as openHAB. If it permanently fails you may configure the IP address of your hue bridge manually in the openHAB configuration.");
-				}
-			}
-			String secret = (String) config.get("secret");
-			if (StringUtils.isNotBlank(secret)) {
-				this.bridgeSecret = secret;
-			}
+	if (abstractDeviceConfig instanceof HueLightBindingConfig) {
+	    HueLightBindingConfig deviceConfig = (HueLightBindingConfig) abstractDeviceConfig;
 
-			// connect the Hue bridge with the new configs
-			if(this.bridgeIP!=null) {
-				activeBridge = new HueBridge(bridgeIP, bridgeSecret);
-				activeBridge.pairBridgeIfNecessary();
-				
-				context.setBridge(activeBridge);
-			}
-			
-			String refreshIntervalString = (String) config.get("refresh");
-			if (StringUtils.isNotBlank(refreshIntervalString)) {
-				refreshInterval = Long.parseLong(refreshIntervalString);
-				
-				// RefreshInterval is specified in openhap.cfg, therefore enable polling
-				setProperlyConfigured(true);
-			}else{
-				logger.warn("no refreshInterval defined for hue service. Hue tap detection will not work." );
-			}
+	    HueBulb bulb = bulbCache.get(deviceConfig.getDeviceNumber());
+	    if (bulb == null) {
+		bulb = new HueBulb(bridge, deviceConfig.getDeviceNumber());
+		bulbCache.put(deviceConfig.getDeviceNumber(), bulb);
+	    }
+
+	    if (command instanceof OnOffType) {
+		bulb.switchOn(OnOffType.ON.equals(command));
+	    }
+
+	    if (command instanceof HSBType) {
+		HSBType hsbCommand = (HSBType) command;
+		DecimalType hue = hsbCommand.getHue();
+		PercentType sat = hsbCommand.getSaturation();
+		PercentType bri = hsbCommand.getBrightness();
+		bulb.colorizeByHSB(hue.doubleValue() / 360,
+			sat.doubleValue() / 100, bri.doubleValue() / 100);
+	    }
+
+	    if (deviceConfig.getType().equals(BindingType.brightness)
+		    || deviceConfig.getType().equals(BindingType.rgb)) {
+		if (IncreaseDecreaseType.INCREASE.equals(command)) {
+		    int resultingValue = bulb.increaseBrightness(deviceConfig
+			    .getStepSize());
+		    eventPublisher.postUpdate(itemName, new PercentType(
+			    resultingValue));
+		} else if (IncreaseDecreaseType.DECREASE.equals(command)) {
+		    int resultingValue = bulb.decreaseBrightness(deviceConfig
+			    .getStepSize());
+		    eventPublisher.postUpdate(itemName, new PercentType(
+			    resultingValue));
+		} else if ((command instanceof PercentType)
+			&& !(command instanceof HSBType)) {
+		    bulb.setBrightness((int) Math.round((double) 255
+			    / (double) 100 * ((PercentType) command).intValue()));
 		}
+	    }
 
+	    if (deviceConfig.getType().equals(BindingType.colorTemperature)) {
+		if (IncreaseDecreaseType.INCREASE.equals(command)) {
+		    bulb.increaseColorTemperature(deviceConfig.getStepSize());
+		} else if (IncreaseDecreaseType.DECREASE.equals(command)) {
+		    bulb.decreaseColorTemperature(deviceConfig.getStepSize());
+		} else if (command instanceof PercentType) {
+		    bulb.setColorTemperature((int) Math
+			    .round((((double) 346 / (double) 100) * ((PercentType) command)
+				    .intValue()) + 154));
+		}
+	    }
+	} else {
+	    // do nothing for tap devices; my self-crated commands will arrive
+	    // here
+	    // logger.warn("Item '"+itemName+"' is no hue bulb! Command ignored.");
 	}
+    }
+
+    /**
+     * Lookup of the configuration of the named item.
+     * 
+     * @param itemName
+     *            The name of the item.
+     * @return The configuration, null otherwise.
+     */
+    private AbstractHueBindingConfig getConfigForItemName(String itemName) {
+	for (HueBindingProvider provider : this.providers) {
+	    if (provider.getItemConfig(itemName) != null) {
+		return provider.getItemConfig(itemName);
+	    }
+	}
+	return null;
+    }
+
+    @SuppressWarnings("rawtypes")
+    @Override
+    public void updated(Dictionary config) throws ConfigurationException {
+	logger.debug("updated");
+	if (config != null) {
+	    String ip = (String) config.get("ip");
+	    if (StringUtils.isNotBlank(ip)) {
+		this.bridgeIP = ip;
+	    } else {
+		try {
+		    this.bridgeIP = new SsdpDiscovery()
+			    .findIpForResponseKeywords("description.xml",
+				    "FreeRTOS");
+		} catch (IOException e) {
+		    logger.warn("Could not find hue bridge automatically. Please make sure it is switched on and connected to the same network as openHAB. If it permanently fails you may configure the IP address of your hue bridge manually in the openHAB configuration.");
+		}
+	    }
+	    String secret = (String) config.get("secret");
+	    if (StringUtils.isNotBlank(secret)) {
+		this.bridgeSecret = secret;
+	    }
+
+	    // connect the Hue bridge with the new configs
+	    if (this.bridgeIP != null) {
+		activeBridge = new HueBridge(bridgeIP, bridgeSecret);
+		activeBridge.pairBridgeIfNecessary();
+
+		context.setBridge(activeBridge);
+	    }
+
+	    String refreshIntervalString = (String) config.get("refresh");
+	    if (StringUtils.isNotBlank(refreshIntervalString)) {
+		refreshInterval = Long.parseLong(refreshIntervalString);
+
+		// RefreshInterval is specified in openhap.cfg, therefore enable
+		// polling
+		setProperlyConfigured(true);
+	    } else {
+		logger.warn("no refreshInterval defined for hue service. Hue tap detection will not work.");
+	    }
+	}
+
+    }
 
 }

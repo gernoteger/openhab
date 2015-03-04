@@ -10,7 +10,8 @@ Eclipse-BuddyPolicy: registered
 Bundle-License: http://www.eclipse.org/legal/epl-v10.html
 Bundle-Description: This is the rule support of the open Home Aut
  omation Bus (openHAB)
-Import-Package: org.openhab.action.javarule.internal,
+Import-Package: org.openhab.action.hue.internal,
+ org.openhab.action.javarule.internal,
  org.openhab.action.javarule.internal.items,
  org.openhab.action.javarule.osgi,
  org.openhab.core.items,
