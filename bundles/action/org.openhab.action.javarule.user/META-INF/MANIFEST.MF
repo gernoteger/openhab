@@ -11,6 +11,11 @@ Bundle-License: http://www.eclipse.org/legal/epl-v10.html
 Bundle-Description: This is the rule support of the open Home Aut
  omation Bus (openHAB)
 Import-Package: org.openhab.action.hue.internal,
+ org.codehaus.jackson;version="1.9.2",
+ org.codehaus.jackson.annotate;version="1.9.2",
+ org.codehaus.jackson.map;version="1.9.2",
+ org.codehaus.jackson.map.annotate;version="1.9.2",
+ org.codehaus.jackson.type;version="1.9.2",
  org.openhab.action.javarule.internal,
  org.openhab.action.javarule.internal.items,
  org.openhab.action.javarule.osgi,
@@ -22,7 +27,7 @@ Import-Package: org.openhab.action.hue.internal,
  org.slf4j
 Bundle-SymbolicName: org.openhab.action.javarule.user
 Bundle-DocURL: http://www.openhab.org
-Bundle-RequiredExecutionEnvironment: J2SE-1.5
+Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Service-Component: OSGI-INF/ruleservice.xml
 Bundle-ClassPath: .
 Export-Package: org.openhab.action.javarule.user
