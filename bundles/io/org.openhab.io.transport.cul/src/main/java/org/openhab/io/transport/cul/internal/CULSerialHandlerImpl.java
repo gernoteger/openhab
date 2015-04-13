@@ -90,6 +90,7 @@ public class CULSerialHandlerImpl extends AbstractCULHandler implements
 	 *            The RF mode for which the device will be configured.
 	 */
 	public CULSerialHandlerImpl(String deviceName, CULMode mode) {
+		### hier ist der Fehler?ß
 		this(deviceName, mode, null);
 	}
 

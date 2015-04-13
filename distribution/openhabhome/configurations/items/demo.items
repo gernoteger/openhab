@@ -18,6 +18,13 @@ Group FF_Child 		"Child's Room" 	<boy1> 		(gFF)
 Group FF_Bed 		"Bedroom" 		<bedroom> 	(gFF)
 Group FF_Corridor 	"Corridor" 		<corridor> 	(gFF)
 
+/* for fixing issue #2428 */
+/** CULS */
+Switch  Wallplugs_i1    "KiZi Hase"             <message_socket>    {culintertechno="type=classic;group=I;address=1"}
+Switch  Wallplugs_i2    "ElZi Lampe Fenster"    <message_socket>    {culintertechno="type=classic;group=I;address=2"}
+Switch  Wallplugs_i3    "WoZi Fernsehen"        <message_socket>    {culintertechno="type=classic;group=I;address=3"}
+
+
 /* active groups */
 Group:Switch:OR(ON, OFF) 		Lights 		"All Lights [(%d)]" 								(All)
 Group:Switch:OR(ON, OFF) 		Heating 	"No. of Active Heatings [(%d)]" 	<heating> 		(All)
