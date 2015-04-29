@@ -98,7 +98,8 @@
     <module>org.openhab.binding.s300th.test</module>
     <module>org.openhab.binding.fht</module>
     <module>org.openhab.binding.fs20</module>
-    <module>org.openhab.binding.intertechno</module>
+    <module>org.openhab.binding.fs20.test</module>
+	<module>org.openhab.binding.intertechno</module>
     <module>org.openhab.binding.openenergymonitor</module>
     <module>org.openhab.binding.netatmo</module>
     <module>org.openhab.binding.netatmo.test</module>

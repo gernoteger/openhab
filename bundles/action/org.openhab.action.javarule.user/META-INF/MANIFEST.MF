@@ -10,16 +10,17 @@ Eclipse-BuddyPolicy: registered
 Bundle-License: http://www.eclipse.org/legal/epl-v10.html
 Bundle-Description: This is the rule support of the open Home Aut
  omation Bus (openHAB)
-Import-Package: org.openhab.action.hue.internal,
- org.codehaus.jackson;version="1.9.2",
+Import-Package: org.codehaus.jackson;version="1.9.2",
  org.codehaus.jackson.annotate;version="1.9.2",
  org.codehaus.jackson.map;version="1.9.2",
  org.codehaus.jackson.map.annotate;version="1.9.2",
  org.codehaus.jackson.type;version="1.9.2",
+ org.openhab.action.hue.internal,
  org.openhab.action.javarule.internal,
  org.openhab.action.javarule.internal.items,
  org.openhab.action.javarule.osgi,
  org.openhab.core.items,
+ org.openhab.core.library.items,
  org.openhab.core.library.types,
  org.openhab.core.types,
  org.osgi.framework;version="1.7.0",

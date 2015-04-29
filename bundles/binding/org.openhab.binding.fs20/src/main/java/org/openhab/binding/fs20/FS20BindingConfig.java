@@ -8,6 +8,9 @@
  */
 package org.openhab.binding.fs20;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import org.openhab.core.binding.BindingConfig;
 import org.openhab.core.items.Item;
 
@@ -19,36 +22,89 @@ import org.openhab.core.items.Item;
  */
 public class FS20BindingConfig implements BindingConfig {
 
-	/**
-	 * The complete address including Housecode of the device
-	 */
-	private String address;
-	private Item item;
-	/***
-	 * possible extra options when communicating with the device. currently
-	 * unused.
-	 */
-	private String extraOpts;
+    /**
+     * The complete address including Housecode of the device
+     */
+    private final String address;
+    /**
+     * only for Rollershutter: time for a full move
+     */
+    private final Integer moveDurationMillis;
 
-	public FS20BindingConfig(String address, Item item) {
-		this.address = address;
-		this.item = item;
+    private Item item = null;
+
+    /***
+     * possible extra options when communicating with the device. currently
+     * unused.
+     */
+    private String extraOpts;
+
+    private final static Pattern DURATION_PATTERN = Pattern
+	    .compile("t=([0-9]+)(ms)?");
+
+    private final static Pattern ADRESS_PATTERN = Pattern
+	    .compile("[A-F0-9]{6}");
+
+    /**
+     * parse form config String
+     * 
+     * @param config
+     * @return FS20BindingConfig or null if not parseable
+     */
+    public static FS20BindingConfig parse(String config) {
+	// extract adress
+	// could be done better..
+	// strip whitespaces & create elements
+	String[] tokens = config.replaceAll("\\s", "").split(";");
+	Integer duration_ms = null;
+	if (tokens.length < 1)
+	    return null;
+
+	if (!ADRESS_PATTERN.matcher(tokens[0]).matches()) {
+	    return null;
 	}
 
-	public String getExtraOpts() {
-		return extraOpts;
+	// parse duration
+	if (tokens.length > 1) {
+	    Matcher m = DURATION_PATTERN.matcher(tokens[1]);
+	    if (m.matches()) {
+		String duration = m.group(1);
+		if (duration != null) {
+		    duration_ms = Integer.parseInt(duration);
+		}
+	    }
 	}
 
-	public void setExtraOpts(String extraOpts) {
-		this.extraOpts = extraOpts;
-	}
+	return new FS20BindingConfig(tokens[0], duration_ms);
+    }
 
-	public String getAddress() {
-		return address;
-	}
+    private FS20BindingConfig(String address, Integer moveDurationMillis) {
+	this.address = address;
+	this.moveDurationMillis = moveDurationMillis;
+    }
 
-	public Item getItem() {
-		return item;
-	}
+    public String getExtraOpts() {
+	return extraOpts;
+    }
+
+    public void setExtraOpts(String extraOpts) {
+	this.extraOpts = extraOpts;
+    }
+
+    public String getAddress() {
+	return address;
+    }
+
+    public Item getItem() {
+	return item;
+    }
+
+    public void setItem(Item item) {
+	this.item = item;
+    }
+
+    public Integer getMoveDurationMillis() {
+	return moveDurationMillis;
+    }
 
 }

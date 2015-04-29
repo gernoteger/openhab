@@ -8,6 +8,7 @@
  */
 package org.openhab.action.javarule.osgi;
 
+import org.openhab.action.javarule.internal.ScriptRunner;
 import org.openhab.core.events.EventPublisher;
 import org.openhab.core.items.ItemRegistry;
 import org.osgi.framework.BundleActivator;
@@ -38,6 +39,9 @@ public abstract class AbstractRuleActivator implements BundleActivator {
 		    bc, EventPublisher.class, null);
 	}
 	eventPublisherTracker.open();
+
+	// TODO: testing only
+	ScriptRunner.startScriptEngines();
     }
 
     /**

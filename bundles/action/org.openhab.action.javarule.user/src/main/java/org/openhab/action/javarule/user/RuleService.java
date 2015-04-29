@@ -16,7 +16,8 @@ public class RuleService extends AbstractRuleService {
 
     @Override
     protected List<? extends Rule> findRules() {
-	return Arrays.asList(new TestRule(), new HueRule(), new TapRule());
+	return Arrays.asList(new TestRule(), new HueRule(), new TapRule(),
+		new ShutterRule());
     }
 
 }
