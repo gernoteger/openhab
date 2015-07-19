@@ -89,6 +89,7 @@ public class HueSettings {
 				.node(deviceId) != null);
 	}
 	
+	
 	/**
 	 * Determines whether the given bulb is turned on.
 	 * 
