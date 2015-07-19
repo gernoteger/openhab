@@ -6,12 +6,12 @@
 	<parent>
 		<groupId>org.openhab.bundles</groupId>
 		<artifactId>binding</artifactId>
-		<version>1.7.0-SNAPSHOT</version>
+		<version>1.8.0-SNAPSHOT</version>
 	</parent>
 
 	<properties>
-		<bundle.symbolicName>org.openhab.binding.hue.test</bundle.symbolicName>
-		<bundle.namespace>org.openhab.binding.hue.test</bundle.namespace>
+		<bundle.symbolicName>org.openhab.binding.fs20.test</bundle.symbolicName>
+		<bundle.namespace>org.openhab.binding.fs20.test</bundle.namespace>
 	</properties>
 
 	<modelVersion>4.0.0</modelVersion>

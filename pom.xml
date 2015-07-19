@@ -296,15 +296,6 @@
                 <enabled>true</enabled>
             </snapshots>
         </pluginRepository>
-        <pluginRepository>
-            <id>openhab.repository</id>
-            <name>openHAB Cloudbees Repository</name>
-            <url>http://repository-openhab.forge.cloudbees.com/release/</url>
-        </pluginRepository>
-        <pluginRepository>
-            <id>tycho-snapshots</id>
-            <url>https://oss.sonatype.org/content/groups/public/</url>
-        </pluginRepository>
     </pluginRepositories>
     
     <profiles>
