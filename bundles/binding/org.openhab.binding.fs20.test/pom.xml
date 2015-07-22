@@ -16,7 +16,7 @@
 
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.openhab.binding</groupId>
-	<artifactId>org.openhab.binding.hue.test</artifactId>
+	<artifactId>org.openhab.binding.fs20.test</artifactId>
 
 	<name>openHAB hue Binding Tests</name>
 
